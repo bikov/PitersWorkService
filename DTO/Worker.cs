@@ -15,10 +15,20 @@ namespace PitersWorkService.DTO
         [XmlElement("HourlyRate")]
         public int HourlyRate { get; set; }
 
-        public Worker(int workerid, int hourlyRate)
+        [DataMember]
+        [XmlElement("FirstName")]
+        public string FirstName{ get; set; }
+
+        [DataMember]
+        [XmlElement("Lastname")]
+        public string Lastname { get; set; }
+
+        public Worker(int workerid, int hourlyRate, string firstName, string lastname)
         {
             Workerid = workerid;
             HourlyRate = hourlyRate;
+            FirstName = firstName;
+            Lastname = lastname;
         }
 
         public Worker()

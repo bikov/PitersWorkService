@@ -16,9 +16,11 @@ namespace PitersWorkService.Service
     {
         private WorkFiles _workFiles;
         private XmlSerializer _workSerializer;
+        private XmlSerializer _staticDataSerializer;
 
         public PitersWorkService()
         {
+            _staticDataSerializer = new XmlSerializer(typeof(StaticData), new Type[] { typeof(Material), typeof(Worker), typeof(Proiority) });
             _workSerializer = new XmlSerializer(typeof(Work),new Type[] {typeof(Material), typeof(Worker), typeof(StationWork), typeof(Proiority) });
             _workFiles = new WorkFiles();
         }
@@ -26,8 +28,6 @@ namespace PitersWorkService.Service
 
         public StaticData GetStaticData()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(StaticData), new Type[] { typeof(Material), typeof(Worker), typeof(Proiority) });
-
             #region ToDeletelatter
 
             var staticData = new StaticData();
@@ -46,34 +46,37 @@ namespace PitersWorkService.Service
 
             staticData.Workers= new List<Worker>
             {
-                new Worker(1256320,45)
+                new Worker(1256320,45,"Piter","Udachin"),
+                new Worker(123,45,"Bikov", "Vlad")
             };
 
             using (FileStream fs = new FileStream(Config.StaticDataFilePath, FileMode.Create))
             {
-                serializer.Serialize(fs, staticData);
+                _staticDataSerializer.Serialize(fs, staticData);
             }
             #endregion
 
             StaticData resulData;
             using (FileStream fs = new FileStream(Config.StaticDataFilePath, FileMode.Open))
             {
-                resulData = (StaticData)serializer.Deserialize(fs);
+                resulData = (StaticData)_staticDataSerializer.Deserialize(fs);
             }
 
             return resulData;
         }
 
-        public Work GetWorkByDrawingNumber(string drawingNumber)
+        public Worker GetWorker(int id)
         {
-            var filePath = _workFiles.GetFilePathByDrawingNumber(drawingNumber);
-            return GetWorkFromFile(filePath);
+            using (FileStream fs = new FileStream(Config.StaticDataFilePath, FileMode.Open))
+            {
+                var staticData = (StaticData)_staticDataSerializer.Deserialize(fs);
+                return staticData.Workers.SingleOrDefault(w => w.Workerid == id);
+            }
         }
 
-        public Work GetWorkByRouteCard(string routeCard)
+        public Work GetWork(string routeCard, string drawingNumber)
         {
-            var filePath = _workFiles.GetFilePathByRouteCard(routeCard);
-            return GetWorkFromFile(filePath);
+            return GetWorkFromFile(routeCard, drawingNumber);
         }
 
         public void SaveWork(Work toSave)
@@ -89,22 +92,32 @@ namespace PitersWorkService.Service
             }
         }
 
-        private Work GetWorkFromFile(string filePath)
+        private Work GetWorkFromFile(string routeCard, string drawingNumber)
         {
             Work retsultWork;
-            if (filePath.Equals(string.Empty))
+            var folderPath = $"{Config.WorksFolderPath}//{routeCard}";
+            if (!Directory.Exists(folderPath))
             {
-                retsultWork = new Work();
+                Directory.CreateDirectory(folderPath);
             }
-            else
+            using (FileStream fs = new FileStream($"{folderPath}//{drawingNumber}.xml", FileMode.OpenOrCreate))
             {
-                using (FileStream fs = new FileStream(filePath, FileMode.Open))
+                if (fs.Length != 0)
                 {
-                    retsultWork = (Work)_workSerializer.Deserialize(fs);
+                    retsultWork = (Work) _workSerializer.Deserialize(fs);
+                }
+                else
+                {
+                    retsultWork = new Work();
                 }
             }
 
             return retsultWork;
+        }
+
+        private string getWorkFilePath(string routeCard, string drawingNumber)
+        {
+            return Config.WorksFolderPath + $"//{routeCard} // {drawingNumber}.xml";
         }
     }
 }

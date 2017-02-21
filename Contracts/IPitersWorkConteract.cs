@@ -15,12 +15,12 @@ namespace PitersWorkService.Contracts
         StaticData GetStaticData();
 
         [OperationContract]
-        Work GetWorkByRouteCard(string routeCard);
-
-        [OperationContract]
-        Work GetWorkByDrawingNumber(string drawingNumber);
+        Work GetWork(string routeCard, string drawingNumber);
 
         [OperationContract]
         void SaveWork(Work toSave);
+
+        [OperationContract]
+        Worker GetWorker(int id);
     }
 }

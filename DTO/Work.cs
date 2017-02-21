@@ -41,16 +41,9 @@ namespace PitersWorkService.DTO
         [XmlElement("Proiority")]
         public Proiority Proiority { get; set; }
 
-        public Work(string routeCard, string drawingNumber, Material material, int quantity, Worker worker, List<StationWork> stationWorks, Proiority proiority)
-        {
-            RouteCard = routeCard;
-            DrawingNumber = drawingNumber;
-            Material = material;
-            Quantity = quantity;
-            Worker = worker;
-            StationWorks = stationWorks;
-            Proiority = proiority;
-        }
+        [DataMember]
+        [XmlElement("IsFinished")]
+        public bool IsFinished{ get; set; }
 
         public Work()
         {
