@@ -29,5 +29,10 @@ namespace PitersWorkService.DTO
         [XmlArrayItem("Proiority")]
         [DataMember]
         public List<Proiority> Proiorities { get; set; }
+
+        [XmlArray("Stations")]
+        [XmlArrayItem("Stations")]
+        [DataMember]
+        public List<Station> Stations { get; set; }
     }
 }

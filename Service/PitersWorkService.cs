@@ -50,6 +50,11 @@ namespace PitersWorkService.Service
                 new Worker(123,45,"Bikov", "Vlad")
             };
 
+            staticData.Stations = new List<Station>
+            {
+                new Station("Haas Vf3")
+            };
+
             using (FileStream fs = new FileStream(Config.StaticDataFilePath, FileMode.Create))
             {
                 _staticDataSerializer.Serialize(fs, staticData);
@@ -81,12 +86,8 @@ namespace PitersWorkService.Service
 
         public void SaveWork(Work toSave)
         {
-            var filePath = _workFiles.GetFilePathByDrawingNumber(toSave.DrawingNumber);
-            if (filePath.Equals(string.Empty))
-            {
-                filePath= _workFiles.GenerateFilePathAndSave(toSave);
-            }
-            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            var folderPath = $"{Config.WorksFolderPath}//{toSave.RouteCard}";
+            using (FileStream fs = new FileStream($"{folderPath}//{toSave.DrawingNumber}.xml", FileMode.Create))
             {
                 _workSerializer.Serialize(fs, toSave);
             }
@@ -113,11 +114,6 @@ namespace PitersWorkService.Service
             }
 
             return retsultWork;
-        }
-
-        private string getWorkFilePath(string routeCard, string drawingNumber)
-        {
-            return Config.WorksFolderPath + $"//{routeCard} // {drawingNumber}.xml";
         }
     }
 }

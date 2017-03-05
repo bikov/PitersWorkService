@@ -40,25 +40,6 @@ namespace PitersWorkService.Logic
             }
         }
 
-        public string GetFilePathByDrawingNumber(string drawingNumber)
-        {
-            lock (LockObj)
-            {
-                using (FileStream fs = new FileStream(Config.WorksFileIndexesPath, FileMode.OpenOrCreate))
-                {
-                    if (fs.Length != 0)
-                    {
-                        WorkIndexes indexes = (WorkIndexes) _serializer.Deserialize(fs);
-                        var firstOrDefault =
-                            indexes.WorkIndices.FirstOrDefault((index => index.Drawing == drawingNumber));
-                        if (firstOrDefault != null)
-                            return (firstOrDefault.FileName);
-                    }
-                    return string.Empty;
-                }
-            }
-        }
-
         public string GenerateFilePathAndSave(Work work)
         {
             lock (LockObj)
